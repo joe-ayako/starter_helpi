@@ -24,9 +24,13 @@ function App() {
   function changeKey(event: React.ChangeEvent<HTMLInputElement>) {
     setKey(event.target.value);
   }
+  
   return (
     <div className="App">
       <header className="App-header">
+        
+        <h1 style={{ fontSize: '48px', color: '#61dafb' }}>Joe</h1>
+        
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
