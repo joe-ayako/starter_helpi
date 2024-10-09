@@ -29,7 +29,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         
-        <h1 style={{ fontSize: '48px', color: '#61dafb' }}>Joe</h1>
+        <h1 style={{ fontSize: '48px', color: '#61dafb' }}>Angel, Joe</h1>
         
         <img src={logo} className="App-logo" alt="logo" />
         <p>
