@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Button, Form } from 'react-bootstrap';
 import Header from './Header';
-import DetailedQuestions from './DetailedQuestions';
 import BasicQuestions from './BasicQuestions';
+import DetailedQuestions from './DetailedQuestions';
 
 function navigateToDetailedQuestions() {
   window.location.href = '/detailed';

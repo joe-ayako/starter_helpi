@@ -1,10 +1,10 @@
 import React from 'react';
 import Header from './Header'; // Import the Header component
 
-const BasicQuestions = () => {
+export const BasicQuestions = () => {
   return (
     <div>
-      <Header /> 
+      <Header />
       {/* Rest of your component code here */}
     </div>
   );
