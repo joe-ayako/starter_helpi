@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Button, Form } from 'react-bootstrap';
+import Header from './Header';
+import BasicQuestions from './BasicQuestions';
+import DetailedQuestions from './DetailedQuestions';
+
+function navigateToDetailedQuestions() {
+  window.location.href = '/detailed';
+}
+
+function navigateToBasicQuestions() {
+  window.location.href = '/basic';
+}
 
 //local storage and API Key: key should be entered in by the user and will be stored in local storage (NOT session storage)
 let keyData = "";
@@ -13,7 +23,8 @@ if (prevKey !== null) {
 
 function App() {
   const [key, setKey] = useState<string>(keyData); //for api key input
-  
+  const url = window.location.pathname;
+
   //sets the local storage item to the api key the user inputed
   function handleSubmit() {
     localStorage.setItem(saveKeyData, JSON.stringify(key));
@@ -24,32 +35,36 @@ function App() {
   function changeKey(event: React.ChangeEvent<HTMLInputElement>) {
     setKey(event.target.value);
   }
-  
+
   return (
     <div className="App">
-      <header className="App-header">
-        
-        <h1 style={{ fontSize: '48px', color: '#61dafb' }}>Axel, Joe, Angel</h1>
-        
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <Form>
-        <Form.Label>API Key:</Form.Label>
-        <Form.Control type="password" placeholder="Insert API Key Here" onChange={changeKey}></Form.Control>
-        <br></br>
-        <Button className="Submit-Button" onClick={handleSubmit}>Submit</Button>
-      </Form>
+      <Header />
+      {url === '/detailed' ? (
+        <DetailedQuestions />
+      ) : url === '/basic' ? (
+        <BasicQuestions />
+      ) : (
+        <div>
+          <div>
+            <Button variant="primary" onClick={() => navigateToDetailedQuestions()}>Detailed Questions</Button>
+            <p>This is a longer quiz that will provide a more thorough look into your future career 
+              and will give possible paths and options to pursue said careers.
+            </p>
+          </div>
+          <div>
+            <Button variant="primary" onClick={() => navigateToBasicQuestions()}>Basic Questions</Button>
+            <p>This is a shorter quiz that is intended for people who want a quick answer and are curious
+              about potential career options.
+            </p>
+          </div>
+          <Form>
+            <Form.Label>API Key:</Form.Label>
+            <Form.Control type="password" placeholder="Insert API Key Here" onChange={changeKey}></Form.Control>
+            <br></br>
+            <Button className="Submit-Button" onClick={handleSubmit}>Submit</Button>
+          </Form>
+        </div>
+      )}
     </div>
   );
 }
