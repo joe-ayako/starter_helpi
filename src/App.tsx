@@ -6,11 +6,11 @@ import BasicQuestions from './BasicQuestions';
 import DetailedQuestions from './DetailedQuestions';
 
 function navigateToDetailedQuestions() {
-  window.location.href = '/detailed';
+  window.location.href = './DetailedQuestions';
 }
 
 function navigateToBasicQuestions() {
-  window.location.href = '/basic';
+  window.location.href = './BasicQuestions';
 }
 
 //local storage and API Key: key should be entered in by the user and will be stored in local storage (NOT session storage)
@@ -39,9 +39,9 @@ function App() {
   return (
     <div className="App">
       <Header />
-      {url === '/detailed' ? (
+      {url === './DetailedQuestions' ? (
         <DetailedQuestions />
-      ) : url === '/basic' ? (
+      ) : url === './BasicQuestions' ? (
         <BasicQuestions />
       ) : (
         <div>
