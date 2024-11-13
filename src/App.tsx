@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, ProgressBar } from 'react-bootstrap';
 
 interface Question {
   question: string;
@@ -47,6 +47,10 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
   };
 
+  // Calculate how many questions are answered
+  const answeredQuestions = Object.keys(answers).length;
+  const progress = Math.round((answeredQuestions / questions.length) * 100);
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -72,6 +76,9 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
               Next
             </button>
           </div>
+
+          {/* Progress Bar */}
+          <ProgressBar now={progress} label={`${progress}%`} style={{ marginTop: '20px' }} />
         </div>
       </div>
     </div>
