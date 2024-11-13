@@ -3,7 +3,7 @@
 > react-scripts test --coverage
 
 FAIL src/App.test.tsx
-  ✕ renders learn react link (42 ms)
+  ✕ renders learn react link (43 ms)
 
   ● renders learn react link
 
@@ -94,18 +94,18 @@ FAIL src/App.test.tsx
       at _run10000 (node_modules/@jest/core/build/cli/index.js:320:7)
       at runCLI (node_modules/@jest/core/build/cli/index.js:173:3)
 
---------------------|---------|----------|---------|---------|-----------------------------
-File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s           
---------------------|---------|----------|---------|---------|-----------------------------
-All files           |   31.91 |       30 |   11.76 |   36.58 |                             
- App.tsx            |   41.66 |       50 |   13.33 |      50 | 39-56,96-97,101-102,117-123 
- index.tsx          |       0 |      100 |     100 |       0 | 7-19                        
- reportWebVitals.ts |       0 |        0 |       0 |       0 | 3-10                        
---------------------|---------|----------|---------|---------|-----------------------------
+--------------------|---------|----------|---------|---------|-------------------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s             
+--------------------|---------|----------|---------|---------|-------------------------------
+All files           |   30.61 |       30 |   11.76 |   34.88 |                               
+ App.tsx            |   39.47 |       50 |   13.33 |   46.87 | 39-60,103-104,108-109,124-130 
+ index.tsx          |       0 |      100 |     100 |       0 | 7-19                          
+ reportWebVitals.ts |       0 |        0 |       0 |       0 | 3-10                          
+--------------------|---------|----------|---------|---------|-------------------------------
 Test Suites: 1 failed, 1 total
 Tests:       1 failed, 1 total
 Snapshots:   0 total
-Time:        2.813 s
+Time:        2.665 s
 Ran all test suites.
 [0;33mOne of your dependencies, babel-preset-react-app, is importing the
 "@babel/plugin-proposal-private-property-in-object" package without
