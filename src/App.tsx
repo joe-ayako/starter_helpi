@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Button, Form, ProgressBar } from 'react-bootstrap';
+import { Button, Form, ProgressBar, Modal } from 'react-bootstrap';
 
 interface Question {
   question: string;
@@ -38,6 +38,7 @@ const initialKeyData: string = prevKey ? JSON.parse(prevKey) : '';
 const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
 
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
@@ -50,6 +51,14 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   // Calculate how many questions are answered
   const answeredQuestions = Object.keys(answers).length;
   const progress = Math.round((answeredQuestions / questions.length) * 100);
+
+  // Show submit button only if all questions are answered
+  const handleSubmit = () => {
+    setShowSubmitModal(true); // Show the submit modal
+  };
+
+  // Check if all questions are answered
+  const allAnswered = answeredQuestions === questions.length;
 
   return (
     <div>
@@ -79,6 +88,31 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
 
           {/* Progress Bar */}
           <ProgressBar now={progress} label={`${progress}%`} style={{ marginTop: '20px' }} />
+
+          {/* Submit button when all questions are answered */}
+          {allAnswered && !showSubmitModal && (
+            <Button variant="success" onClick={handleSubmit} style={{ marginTop: '20px' }}>
+              Submit
+            </Button>
+          )}
+
+          {/* Modal for Submit */}
+          <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Submit Your Answers</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Are you sure you want to submit your answers?
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={() => alert('Your answers have been submitted!')}>
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     </div>
