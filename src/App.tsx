@@ -48,16 +48,13 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
   };
 
-  // Calculate how many questions are answered
   const answeredQuestions = Object.keys(answers).length;
   const progress = Math.round((answeredQuestions / questions.length) * 100);
 
-  // Show submit button only if all questions are answered
   const handleSubmit = () => {
-    setShowSubmitModal(true); // Show the submit modal
+    setShowSubmitModal(true);
   };
 
-  // Check if all questions are answered
   const allAnswered = answeredQuestions === questions.length;
 
   return (
@@ -119,24 +116,17 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   );
 };
 
-const Header: React.FC = () => {
+const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => {
   return (
     <header style={{ backgroundColor: 'blue', color: 'white', padding: '1rem', textAlign: 'center' }}>
-      <a href="/">
-        <button>Go to Home</button>
-      </a>
+      <button onClick={() => setPage('home')}>Go to Home</button>
     </header>
   );
 };
 
 const App: React.FC = () => {
   const [key, setKey] = useState<string>(initialKeyData);
-  const [page, setPage] = useState<string>(window.location.pathname);
-
-  const handleNavigation = (path: string) => {
-    setPage(path);
-    window.history.pushState({}, '', path);
-  };
+  const [page, setPage] = useState<string>('home'); // Home page as default
 
   const handleSubmit = () => {
     localStorage.setItem(saveKeyData, JSON.stringify(key));
@@ -147,24 +137,23 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <Header />
-      {page === '/basic' ? (
-        <Questions questions={basicQuestions} />
-      ) : page === '/detailed' ? (
-        <Questions questions={detailedQuestions} />
-      ) : (
+      <Header setPage={setPage} />
+      {page === 'home' && (
         <div>
-          <div>
-            <Button variant="primary" onClick={() => handleNavigation('/detailed')}>
-              Detailed Questions
-            </Button>
-            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
-          </div>
-          <div>
-            <Button variant="primary" onClick={() => handleNavigation('/basic')}>
-              Basic Questions
-            </Button>
-            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
+          <h1>Welcome to the Career Quiz</h1>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <Button variant="primary" onClick={() => setPage('detailed')}>
+                Detailed Questions
+              </Button>
+              <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
+            </div>
+            <div>
+              <Button variant="primary" onClick={() => setPage('basic')}>
+                Basic Questions
+              </Button>
+              <p>This is a shorter quiz intended for quick insights into potential career options.</p>
+            </div>
           </div>
           <Form>
             <Form.Label>API Key:</Form.Label>
@@ -179,6 +168,8 @@ const App: React.FC = () => {
           </Form>
         </div>
       )}
+      {page === 'basic' && <Questions questions={basicQuestions} />}
+      {page === 'detailed' && <Questions questions={detailedQuestions} />}
     </div>
   );
 };
