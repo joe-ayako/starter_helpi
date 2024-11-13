@@ -47,7 +47,9 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
   };
 
-  const progress = Math.round(((currentQuestion + 1) / questions.length) * 100);
+  // Calculate how many questions are answered
+  const answeredQuestions = Object.keys(answers).length;
+  const progress = Math.round((answeredQuestions / questions.length) * 100);
 
   return (
     <div>
