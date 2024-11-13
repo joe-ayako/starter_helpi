@@ -1,72 +1,145 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Button, Form } from 'react-bootstrap';
-import Header from './Header';
-import BasicQuestions from './BasicQuestions';
-import DetailedQuestions from './DetailedQuestions';
 
-function navigateToDetailedQuestions() {
-  window.location.href = '/detailed';
+interface Question {
+  question: string;
+  answers: string[];
 }
 
-function navigateToBasicQuestions() {
-  window.location.href = '/basic';
+interface QuestionsProps {
+  questions: Question[];
 }
 
-//local storage and API Key: key should be entered in by the user and will be stored in local storage (NOT session storage)
-let keyData = "";
-const saveKeyData = "MYKEY";
-const prevKey = localStorage.getItem(saveKeyData); //so it'll look like: MYKEY: <api_key_value here> in the local storage when you inspect
-if (prevKey !== null) {
-  keyData = JSON.parse(prevKey);
-}
+const basicQuestions: Question[] = [
+  { question: 'What is your favorite color?', answers: ['Red', 'Blue', 'Green', 'Yellow'] },
+  { question: 'What is your favorite animal?', answers: ['Dog', 'Cat', 'Bird', 'Fish'] },
+  { question: 'What is your favorite food?', answers: ['Pizza', 'Sushi', 'Tacos', 'Burgers'] },
+  { question: 'What is your favorite hobby?', answers: ['Reading', 'Writing', 'Drawing', 'Playing music'] },
+  { question: 'What is your favorite sport?', answers: ['Football', 'Basketball', 'Baseball', 'Soccer'] },
+  { question: 'What is your favorite type of music?', answers: ['Rock', 'Pop', 'Hip hop', 'Classical'] },
+  { question: 'What is your favorite type of movie?', answers: ['Action', 'Comedy', 'Romance', 'Horror'] },
+];
 
-function App() {
-  const [key, setKey] = useState<string>(keyData); //for api key input
-  const url = window.location.pathname;
+const detailedQuestions: Question[] = [
+  { question: 'What is your favorite color?', answers: ['Red', 'Blue', 'Green', 'Yellow'] },
+  { question: 'What is your favorite animal?', answers: ['Dog', 'Cat', 'Bird', 'Fish'] },
+  { question: 'What is your favorite cuisine?', answers: ['Italian', 'Chinese', 'Mexican', 'Indian'] },
+  { question: 'What are your hobbies?', answers: ['Reading', 'Traveling', 'Cooking', 'Photography'] },
+  { question: 'What sports do you enjoy?', answers: ['Tennis', 'Golf', 'Rugby', 'Hockey'] },
+  { question: 'What is your favorite type of art?', answers: ['Painting', 'Sculpture', 'Photography', 'Dance'] },
+  { question: 'What genres of movies do you prefer?', answers: ['Sci-Fi', 'Drama', 'Documentary', 'Thriller'] },
+];
 
-  //sets the local storage item to the api key the user inputed
-  function handleSubmit() {
+const saveKeyData = 'MYKEY';
+const prevKey = localStorage.getItem(saveKeyData);
+const initialKeyData: string = prevKey ? JSON.parse(prevKey) : '';
+
+const Questions: React.FC<QuestionsProps> = ({ questions }) => {
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+
+  const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
+  const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
+
+  const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ width: '50%', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
+          <h2>{questions[currentQuestion].question}</h2>
+          {questions[currentQuestion].answers.map((answer, index) => (
+            <div key={index}>
+              <input
+                type="radio"
+                name="answer"
+                value={answer}
+                checked={answers[currentQuestion] === answer}
+                onChange={handleAnswerChange}
+              />
+              <span>{answer}</span>
+            </div>
+          ))}
+          <div>
+            <button onClick={handlePrevious} disabled={currentQuestion === 0}>
+              Previous
+            </button>
+            <button onClick={handleNext} disabled={currentQuestion === questions.length - 1}>
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Header: React.FC = () => {
+  return (
+    <header style={{ backgroundColor: 'blue', color: 'white', padding: '1rem', textAlign: 'center' }}>
+      <a href="/">
+        <button>Go to Home</button>
+      </a>
+    </header>
+  );
+};
+
+const App: React.FC = () => {
+  const [key, setKey] = useState<string>(initialKeyData);
+  const [page, setPage] = useState<string>(window.location.pathname);
+
+  const handleNavigation = (path: string) => {
+    setPage(path);
+    window.history.pushState({}, '', path);
+  };
+
+  const handleSubmit = () => {
     localStorage.setItem(saveKeyData, JSON.stringify(key));
-    window.location.reload(); //when making a mistake and changing the key again, I found that I have to reload the whole site before openai refreshes what it has stores for the local storage variable
-  }
+    window.location.reload();
+  };
 
-  //whenever there's a change it'll store the api key in a local state called key but it won't be set in the local storage until the user clicks the submit button
-  function changeKey(event: React.ChangeEvent<HTMLInputElement>) {
-    setKey(event.target.value);
-  }
+  const changeKey = (event: React.ChangeEvent<HTMLInputElement>) => setKey(event.target.value);
 
   return (
     <div className="App">
       <Header />
-      {url === '/detailed' ? (
-        <DetailedQuestions />
-      ) : url === '/basic' ? (
-        <BasicQuestions />
+      {page === '/basic' ? (
+        <Questions questions={basicQuestions} />
+      ) : page === '/detailed' ? (
+        <Questions questions={detailedQuestions} />
       ) : (
         <div>
           <div>
-            <Button variant="primary" onClick={() => navigateToDetailedQuestions()}>Detailed Questions</Button>
-            <p>This is a longer quiz that will provide a more thorough look into your future career 
-              and will give possible paths and options to pursue said careers.
-            </p>
+            <Button variant="primary" onClick={() => handleNavigation('/detailed')}>
+              Detailed Questions
+            </Button>
+            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
           </div>
           <div>
-            <Button variant="primary" onClick={() => navigateToBasicQuestions()}>Basic Questions</Button>
-            <p>This is a shorter quiz that is intended for people who want a quick answer and are curious
-              about potential career options.
-            </p>
+            <Button variant="primary" onClick={() => handleNavigation('/basic')}>
+              Basic Questions
+            </Button>
+            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
           </div>
           <Form>
             <Form.Label>API Key:</Form.Label>
-            <Form.Control type="password" placeholder="Insert API Key Here" onChange={changeKey}></Form.Control>
-            <br></br>
+            <Form.Control
+              type="password"
+              placeholder="Insert API Key Here"
+              value={key}
+              onChange={changeKey}
+            />
+            <br />
             <Button className="Submit-Button" onClick={handleSubmit}>Submit</Button>
           </Form>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default App;
