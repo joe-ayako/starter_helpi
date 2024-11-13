@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Button, Form } from 'react-bootstrap';
-import Header from './Header';
 
 interface Question {
   question: string;
@@ -22,7 +21,15 @@ const basicQuestions: Question[] = [
   { question: 'What is your favorite type of movie?', answers: ['Action', 'Comedy', 'Romance', 'Horror'] },
 ];
 
-const detailedQuestions: Question[] = basicQuestions; // reuse the same questions
+const detailedQuestions: Question[] = [
+  { question: 'What is your favorite color?', answers: ['Red', 'Blue', 'Green', 'Yellow'] },
+  { question: 'What is your favorite animal?', answers: ['Dog', 'Cat', 'Bird', 'Fish'] },
+  { question: 'What is your favorite cuisine?', answers: ['Italian', 'Chinese', 'Mexican', 'Indian'] },
+  { question: 'What are your hobbies?', answers: ['Reading', 'Traveling', 'Cooking', 'Photography'] },
+  { question: 'What sports do you enjoy?', answers: ['Tennis', 'Golf', 'Rugby', 'Hockey'] },
+  { question: 'What is your favorite type of art?', answers: ['Painting', 'Sculpture', 'Photography', 'Dance'] },
+  { question: 'What genres of movies do you prefer?', answers: ['Sci-Fi', 'Drama', 'Documentary', 'Thriller'] },
+];
 
 const saveKeyData = 'MYKEY';
 const prevKey = localStorage.getItem(saveKeyData);
@@ -34,7 +41,7 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
 
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
-  
+
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
@@ -42,7 +49,6 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
 
   return (
     <div>
-      <Header />
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <div style={{ width: '50%', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
           <h2>{questions[currentQuestion].question}</h2>
@@ -69,6 +75,16 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Header: React.FC = () => {
+  return (
+    <header style={{ backgroundColor: 'blue', color: 'white', padding: '1rem', textAlign: 'center' }}>
+      <a href="/">
+        <button>Go to Home</button>
+      </a>
+    </header>
   );
 };
 
