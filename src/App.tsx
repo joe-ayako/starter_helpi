@@ -10,12 +10,12 @@ interface Question {
 interface QuestionsProps {
   questions: Question[];
   quizType: 'basic' | 'detailed';
-  onSubmit: (answers: { [key: number]: string }) => void;
+  onSubmit: (answers: { [key: number]: string }) => Promise<string>;
 }
 
 interface APIKeyFormProps {
   onSubmit: (apiKey: string) => void;
-  isKeySet: boolean;
+  apiKey: string;
 }
 
 const basicQuestions: Question[] = [
@@ -96,35 +96,35 @@ const detailedQuestions: Question[] = [
   }
 ];
 
-const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, isKeySet }) => {
-  const [apiKey, setApiKey] = useState<string>('');
+const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
+  const [newApiKey, setNewApiKey] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(apiKey);
-    setApiKey('');
+    onSubmit(newApiKey);
+    setNewApiKey('');
   };
 
   return (
-    <div className="api-key-form">
-      {!isKeySet ? (
-        <Form onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label>Enter your ChatGPT API Key</Form.Label>
-            <Form.Control
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your API key"
-              required
-            />
-          </Form.Group>
-          <Button type="submit" variant="primary" className="mt-3">
-            Save API Key
-          </Button>
-        </Form>
-      ) : (
-        <p className="text-success">API Key is set ✓</p>
+    <div className="api-key-form mb-4">
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>ChatGPT API Key {apiKey && '(Currently Set)'}</Form.Label>
+          <Form.Control
+            type="password"
+            value={newApiKey}
+            onChange={(e) => setNewApiKey(e.target.value)}
+            placeholder={apiKey ? "Enter new API key to update" : "Enter your API key"}
+          />
+        </Form.Group>
+        <Button type="submit" variant="primary" className="mt-2">
+          {apiKey ? 'Update API Key' : 'Save API Key'}
+        </Button>
+      </Form>
+      {apiKey && (
+        <div className="text-success mt-2">
+          ✓ API Key is set (submit new key above to update)
+        </div>
       )}
     </div>
   );
@@ -152,9 +152,14 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    localStorage.setItem(`${quizType}QuizAnswers`, JSON.stringify(answers));
-    await onSubmit(answers);
     setShowSubmitModal(true);
+    localStorage.setItem(`${quizType}QuizAnswers`, JSON.stringify(answers));
+    try {
+      const report = await onSubmit(answers);
+      setCareerReport(report);
+    } catch (error) {
+      setCareerReport("There was an error generating your career report. Please check your API key and try again.");
+    }
     setIsLoading(false);
   };
 
@@ -199,12 +204,21 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
             {isLoading ? 'Generating Report...' : 'Submit'}
           </Button>
         )}
-        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)}>
+        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>Career Report</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {careerReport || 'Your answers have been submitted and saved!'}
+            {isLoading ? (
+              <div className="text-center">
+                <p>Generating your career report...</p>
+                <ProgressBar animated now={100} />
+              </div>
+            ) : (
+              <div style={{ whiteSpace: 'pre-line' }}>
+                {careerReport || 'Processing your answers...'}
+              </div>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
@@ -228,6 +242,7 @@ const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }
 const App: React.FC = () => {
   const [page, setPage] = useState<string>('home');
   const [apiKey, setApiKey] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     const savedApiKey = localStorage.getItem('chatgptApiKey');
@@ -239,19 +254,11 @@ const App: React.FC = () => {
   const handleApiKeySubmit = (key: string) => {
     localStorage.setItem('chatgptApiKey', key);
     setApiKey(key);
+    setErrorMessage('');
   };
 
-  const generateCareerReport = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed') => {
+  const checkApiKey = async (): Promise<boolean> => {
     try {
-      const questionAnswerPairs = Object.entries(answers).map(([index, answer]) => {
-        const question = (quizType === 'basic' ? basicQuestions : detailedQuestions)[parseInt(index)].question;
-        return `${question}: ${answer}`;
-      });
-
-      const prompt = `Based on the following career quiz answers, please provide a detailed career analysis and recommendations:
-      ${questionAnswerPairs.join('\n')}
-      Please include: 1. Suggested career paths 2. Key strengths 3. Areas for development 4. Work environment preferences`;
-
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -260,35 +267,78 @@ const App: React.FC = () => {
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ]
+          messages: [{ role: 'user', content: 'test' }]
         })
       });
 
-      const data = await response.json();
-      return data.choices[0].message.content;
+      if (!response.ok) {
+        throw new Error('Invalid API key');
+      }
 
+      return true;
     } catch (error) {
-      console.error('Error generating career report:', error);
-      return 'Error generating career report. Please try again later.';
+      setErrorMessage('Invalid API key. Please check your API key and try again.');
+      return false;
     }
   };
 
-  const handleQuizSubmit = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed') => {
-    const report = await generateCareerReport(answers, quizType);
-    return report;
+  const generateCareerReport = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
+    const isValidKey = await checkApiKey();
+    if (!isValidKey) {
+      throw new Error('Invalid API key');
+    }
+
+    const questionAnswerPairs = Object.entries(answers).map(([index, answer]) => {
+      const question = (quizType === 'basic' ? basicQuestions : detailedQuestions)[parseInt(index)].question;
+      return `${question}: ${answer}`;
+    });
+
+    const prompt = `Based on the following career quiz answers, please provide a detailed career analysis and recommendations:
+    ${questionAnswerPairs.join('\n')}
+    Please include: 1. Suggested career paths 2. Key strengths 3. Areas for development 4. Work environment preferences`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate career report');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  };
+
+  const handleQuizSubmit = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
+    try {
+      const report = await generateCareerReport(answers, quizType);
+      setErrorMessage('');
+      return report;
+    } catch (error) {
+      setErrorMessage('Error generating career report. Please check your API key and try again.');
+      throw error;
+    }
   };
 
   return (
     <div className="App">
       <Header setPage={setPage} />
-      {!apiKey && <APIKeyForm onSubmit={handleApiKeySubmit} isKeySet={!!apiKey} />}
-      {apiKey && page === 'home' && (
+      {page === 'home' && (
         <div className="home-container">
+          <APIKeyForm onSubmit={handleApiKeySubmit} apiKey={apiKey} />
+          {errorMessage && (
+            <div className="alert alert-danger" role="alert">
+              {errorMessage}
+            </div>
+          )}
           <h1>Welcome to the Career Quiz</h1>
           <div className="quiz-selection">
             <Button variant="primary" onClick={() => setPage('detailed')}>
@@ -302,14 +352,14 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-      {apiKey && page === 'basic' && (
+      {page === 'basic' && (
         <Questions 
           questions={basicQuestions} 
           quizType="basic"
           onSubmit={(answers) => handleQuizSubmit(answers, 'basic')}
         />
       )}
-      {apiKey && page === 'detailed' && (
+      {page === 'detailed' && (
         <Questions 
           questions={detailedQuestions} 
           quizType="detailed"
