@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Button, Form, ProgressBar, Modal } from 'react-bootstrap';
 
@@ -10,7 +10,6 @@ interface Question {
 interface QuestionsProps {
   questions: Question[];
 }
-
 const basicQuestions: Question[] = [
   { question: 'What type of work environment do you prefer?', answers: ['Fast-paced', 'Structured', 'Flexible', 'Collaborative'] },
   { question: 'How would you describe your ideal job?', answers: ['Creative', 'Analytical', 'Hands-on', 'People-oriented'] },
@@ -43,6 +42,7 @@ const detailedQuestions: Question[] = [
   },
   { 
     question: 'What role do you enjoy playing in team projects?', 
+
     answers: [
       'I like to lead and organize tasks for the team.',
       'I prefer being a supportive team member, helping others when needed.',
@@ -86,21 +86,21 @@ const detailedQuestions: Question[] = [
       'Starting my own business or working independently.'
     ] 
   }
-];
-
-
-const saveKeyData = 'MYKEY';
-const prevKey = localStorage.getItem(saveKeyData);
-const initialKeyData: string = prevKey ? JSON.parse(prevKey) : '';
+]; 
 
 const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
 
+  // Load saved answers on component mount
+  useEffect(() => {
+    const savedAnswers = JSON.parse(localStorage.getItem('quizAnswers') || '{}');
+    setAnswers(savedAnswers);
+  }, []);
+
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
-
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
@@ -110,18 +110,19 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   const progress = Math.round((answeredQuestions / questions.length) * 100);
 
   const handleSubmit = () => {
+    localStorage.setItem('quizAnswers', JSON.stringify(answers));
     setShowSubmitModal(true);
   };
 
   const allAnswered = answeredQuestions === questions.length;
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div style={{ width: '50%', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
-          <h2>{questions[currentQuestion].question}</h2>
+    <div className="quiz-container">
+      <div className="question-card">
+        <h2 className="question-text">{questions[currentQuestion].question}</h2>
+        <div className="answers-list">
           {questions[currentQuestion].answers.map((answer, index) => (
-            <div key={index}>
+            <label key={index} className="answer-option">
               <input
                 type="radio"
                 name="answer"
@@ -129,101 +130,67 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
                 checked={answers[currentQuestion] === answer}
                 onChange={handleAnswerChange}
               />
-              <span>{answer}</span>
-            </div>
+              {answer}
+            </label>
           ))}
-          <div>
-            <button onClick={handlePrevious} disabled={currentQuestion === 0}>
-              Previous
-            </button>
-            <button onClick={handleNext} disabled={currentQuestion === questions.length - 1}>
-              Next
-            </button>
-          </div>
-
-          {/* Progress Bar */}
-          <ProgressBar now={progress} label={`${progress}%`} style={{ marginTop: '20px' }} />
-
-          {/* Submit button when all questions are answered */}
-          {allAnswered && !showSubmitModal && (
-            <Button variant="success" onClick={handleSubmit} style={{ marginTop: '20px' }}>
-              Submit
-            </Button>
-          )}
-
-          {/* Modal for Submit */}
-          <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>Submit Your Answers</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              Are you sure you want to submit your answers?
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
-                Close
-              </Button>
-              <Button variant="primary" onClick={() => alert('Your answers have been submitted!')}>
-                Submit
-              </Button>
-            </Modal.Footer>
-          </Modal>
         </div>
+        <div className="navigation-buttons">
+          <Button onClick={handlePrevious} disabled={currentQuestion === 0} variant="outline-primary">
+            Previous
+          </Button>
+          <Button onClick={handleNext} disabled={currentQuestion === questions.length - 1} variant="outline-primary">
+            Next
+          </Button>
+        </div>
+        <ProgressBar now={progress} label={`${progress}%`} className="progress-bar" />
+        {allAnswered && (
+          <Button variant="success" onClick={handleSubmit} className="submit-button">
+            Submit
+          </Button>
+        )}
+        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Submit Your Answers</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Answers saved successfully!</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );
 };
 
-const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => {
-  return (
-    <header style={{ backgroundColor: 'blue', color: 'white', padding: '1rem', textAlign: 'center' }}>
-      <button onClick={() => setPage('home')}>Go to Home</button>
-    </header>
-  );
-};
+const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => (
+  <header className="app-header">
+    <h1>Career Quizine</h1>
+    <p>Your Ultimate Recipe for Career Success</p>
+    <button onClick={() => setPage('home')} className="home-button">Home</button>
+  </header>
+);
 
 const App: React.FC = () => {
-  const [key, setKey] = useState<string>(initialKeyData);
-  const [page, setPage] = useState<string>('home'); // Home page as default
-
-  const handleSubmit = () => {
-    localStorage.setItem(saveKeyData, JSON.stringify(key));
-    window.location.reload();
-  };
-
-  const changeKey = (event: React.ChangeEvent<HTMLInputElement>) => setKey(event.target.value);
+  const [page, setPage] = useState<string>('home');
 
   return (
     <div className="App">
       <Header setPage={setPage} />
       {page === 'home' && (
-        <div>
+        <div className="home-container">
           <h1>Welcome to the Career Quiz</h1>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ marginBottom: '20px' }}>
-              <Button variant="primary" onClick={() => setPage('detailed')}>
-                Detailed Questions
-              </Button>
-              <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
-            </div>
-            <div>
-              <Button variant="primary" onClick={() => setPage('basic')}>
-                Basic Questions
-              </Button>
-              <p>This is a shorter quiz intended for quick insights into potential career options.</p>
-            </div>
+          <div className="quiz-selection">
+            <Button variant="primary" onClick={() => setPage('detailed')}>
+              Detailed Questions
+            </Button>
+            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
+            <Button variant="primary" onClick={() => setPage('basic')}>
+              Basic Questions
+            </Button>
+            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
           </div>
-          <Form>
-            <Form.Label>API Key:</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Insert API Key Here"
-              value={key}
-              onChange={changeKey}
-            />
-            <br />
-            <Button className="Submit-Button" onClick={handleSubmit}>Submit</Button>
-          </Form>
         </div>
       )}
       {page === 'basic' && <Questions questions={basicQuestions} />}
