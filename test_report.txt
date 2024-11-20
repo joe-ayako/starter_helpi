@@ -1,0 +1,136 @@
+
+> starter_helpi@0.1.0 test
+> react-scripts test --coverage
+
+FAIL src/App.test.tsx
+  ✕ renders learn react link (42 ms)
+
+  ● renders learn react link
+
+    TestingLibraryElementError: Unable to find an element with the text: /learn react/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"App"[39m
+        [36m>[39m
+          [36m<header[39m
+            [33mclass[39m=[32m"app-header"[39m
+          [36m>[39m
+            [36m<h1>[39m
+              [0mCareer Quizine[0m
+            [36m</h1>[39m
+            [36m<p>[39m
+              [0mYour Ultimate Recipe for Career Success[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"home-button"[39m
+            [36m>[39m
+              [0mHome[0m
+            [36m</button>[39m
+          [36m</header>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"home-container"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"api-key-form mb-4"[39m
+            [36m>[39m
+              [36m<form[39m
+                [33mclass[39m=[32m""[39m
+              [36m>[39m
+                [36m<div>[39m
+                  [36m<label[39m
+                    [33mclass[39m=[32m"form-label"[39m
+                  [36m>[39m
+                    [0mChatGPT API Key [0m
+                  [36m</label>[39m
+                  [36m<input[39m
+                    [33mclass[39m=[32m"form-control"[39m
+                    [33mplaceholder[39m=[32m"Enter your API key"[39m
+                    [33mtype[39m=[32m"password"[39m
+                    [33mvalue[39m=[32m""[39m
+                  [36m/>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"mt-2 btn btn-primary"[39m
+                  [33mtype[39m=[32m"submit"[39m
+                [36m>[39m
+                  [0mSave API Key[0m
+                [36m</button>[39m
+              [36m</form>[39m
+            [36m</div>[39m
+            [36m<h1>[39m
+              [0mWelcome to the Career Quiz[0m
+            [36m</h1>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"quiz-selection"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"btn btn-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mDetailed Questions[0m
+              [36m</button>[39m
+              [36m<p>[39m
+                [0mThis is a longer quiz that will provide a more thorough look into your future career and possible paths.[0m
+              [36m</p>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"btn btn-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0mBasic Questions[0m
+              [36m</button>[39m
+              [36m<p>[39m
+                [0mThis is a shorter quiz intended for quick insights into potential career options.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+       5 | test('renders learn react link', () => {
+       6 |   render(<App />);
+    >  7 |   const linkElement = screen.getByText(/learn react/i);
+         |                              ^
+       8 |   expect(linkElement).toBeInTheDocument();
+       9 | });
+      10 |
+
+      at Object.getElementError (node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at getByText (node_modules/@testing-library/react/node_modules/@testing-library/dom/dist/query-helpers.js:95:19)
+      at Object.<anonymous> (src/App.test.tsx:7:30)
+      at TestScheduler.scheduleTests (node_modules/@jest/core/build/TestScheduler.js:333:13)
+      at runJest (node_modules/@jest/core/build/runJest.js:404:19)
+      at _run10000 (node_modules/@jest/core/build/cli/index.js:320:7)
+      at runCLI (node_modules/@jest/core/build/cli/index.js:173:3)
+
+--------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                   
+--------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+All files           |   19.81 |       25 |    12.9 |   20.79 |                                                                     
+ App.tsx            |   22.58 |    27.77 |   14.28 |   23.86 | 103-105,116,134-224,238,250,255-257,261-281,286-317,321-327,344-366 
+ Header.tsx         |       0 |      100 |       0 |       0 | 3-4                                                                 
+ index.tsx          |       0 |      100 |     100 |       0 | 7-19                                                                
+ reportWebVitals.ts |       0 |        0 |       0 |       0 | 3-10                                                                
+--------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        2.997 s
+Ran all test suites.
+[0;33mOne of your dependencies, babel-preset-react-app, is importing the
+"@babel/plugin-proposal-private-property-in-object" package without
+declaring it in its dependencies. This is currently working because
+"@babel/plugin-proposal-private-property-in-object" is already in your
+node_modules folder for unrelated reasons, but it [1mmay break at any time[0;33m.
+
+babel-preset-react-app is part of the create-react-app project, [1mwhich
+is not maintianed anymore[0;33m. It is thus unlikely that this bug will
+ever be fixed. Add "@babel/plugin-proposal-private-property-in-object" to
+your devDependencies to work around this error. This will make this message
+go away.[0m
+  
