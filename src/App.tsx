@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Button, Form, ProgressBar, Modal } from 'react-bootstrap';
 
@@ -9,6 +9,13 @@ interface Question {
 
 interface QuestionsProps {
   questions: Question[];
+  quizType: 'basic' | 'detailed';
+  onSubmit: (answers: { [key: number]: string }) => Promise<string>;
+}
+
+interface APIKeyFormProps {
+  onSubmit: (apiKey: string) => void;
+  apiKey: string;
 }
 
 const basicQuestions: Question[] = [
@@ -43,6 +50,7 @@ const detailedQuestions: Question[] = [
   },
   { 
     question: 'What role do you enjoy playing in team projects?', 
+
     answers: [
       'I like to lead and organize tasks for the team.',
       'I prefer being a supportive team member, helping others when needed.',
@@ -88,40 +96,84 @@ const detailedQuestions: Question[] = [
   }
 ];
 
+const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
+  const [newApiKey, setNewApiKey] = useState<string>('');
 
-const saveKeyData = 'MYKEY';
-const prevKey = localStorage.getItem(saveKeyData);
-const initialKeyData: string = prevKey ? JSON.parse(prevKey) : '';
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(newApiKey);
+    setNewApiKey('');
+  };
 
-const Questions: React.FC<QuestionsProps> = ({ questions }) => {
+  return (
+    <div className="api-key-form mb-4">
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>ChatGPT API Key {apiKey && '(Currently Set)'}</Form.Label>
+          <Form.Control
+            type="password"
+            value={newApiKey}
+            onChange={(e) => setNewApiKey(e.target.value)}
+            placeholder={apiKey ? "Enter new API key to update" : "Enter your API key"}
+          />
+        </Form.Group>
+        <Button type="submit" variant="primary" className="mt-2">
+          {apiKey ? 'Update API Key' : 'Save API Key'}
+        </Button>
+      </Form>
+      {apiKey && (
+        <div className="text-success mt-2">
+          ✓ API Key is set (submit new key above to update)
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
+  const [careerReport, setCareerReport] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const savedAnswers = JSON.parse(localStorage.getItem(`${quizType}QuizAnswers`) || '{}');
+    setAnswers(savedAnswers);
+  }, [quizType]);
 
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
-
+  
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
   };
 
-  const answeredQuestions = Object.keys(answers).length;
-  const progress = Math.round((answeredQuestions / questions.length) * 100);
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
     setShowSubmitModal(true);
+    localStorage.setItem(`${quizType}QuizAnswers`, JSON.stringify(answers));
+    try {
+      const report = await onSubmit(answers);
+      setCareerReport(report);
+    } catch (error) {
+      setCareerReport("There was an error generating your career report. Please check your API key and try again.");
+    }
+    setIsLoading(false);
   };
 
+  const answeredQuestions = Object.keys(answers).length;
+  const progress = Math.round((answeredQuestions / questions.length) * 100);
   const allAnswered = answeredQuestions === questions.length;
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div style={{ width: '50%', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
-          <h2>{questions[currentQuestion].question}</h2>
+    <div className="quiz-container">
+      <div className="question-card">
+        <h2 className="question-text">{questions[currentQuestion].question}</h2>
+        <div className="answers-list">
           {questions[currentQuestion].answers.map((answer, index) => (
-            <div key={index}>
+            <label key={index} className="answer-option">
               <input
                 type="radio"
                 name="answer"
@@ -129,105 +181,191 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
                 checked={answers[currentQuestion] === answer}
                 onChange={handleAnswerChange}
               />
-              <span>{answer}</span>
-            </div>
+              {answer}
+            </label>
           ))}
-          <div>
-            <button onClick={handlePrevious} disabled={currentQuestion === 0}>
-              Previous
-            </button>
-            <button onClick={handleNext} disabled={currentQuestion === questions.length - 1}>
-              Next
-            </button>
-          </div>
-
-          {/* Progress Bar */}
-          <ProgressBar now={progress} label={`${progress}%`} style={{ marginTop: '20px' }} />
-
-          {/* Submit button when all questions are answered */}
-          {allAnswered && !showSubmitModal && (
-            <Button variant="success" onClick={handleSubmit} style={{ marginTop: '20px' }}>
-              Submit
-            </Button>
-          )}
-
-          {/* Modal for Submit */}
-          <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>Submit Your Answers</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              Are you sure you want to submit your answers?
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
-                Close
-              </Button>
-              <Button variant="primary" onClick={() => alert('Your answers have been submitted!')}>
-                Submit
-              </Button>
-            </Modal.Footer>
-          </Modal>
         </div>
+        <div className="navigation-buttons">
+          <Button onClick={handlePrevious} disabled={currentQuestion === 0} variant="outline-primary">
+            Previous
+          </Button>
+          <Button onClick={handleNext} disabled={currentQuestion === questions.length - 1} variant="outline-primary">
+            Next
+          </Button>
+        </div>
+        <ProgressBar now={progress} label={`${progress}%`} className="progress-bar" />
+        {allAnswered && (
+          <Button 
+            variant="success" 
+            onClick={handleSubmit} 
+            className="submit-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Generating Report...' : 'Submit'}
+          </Button>
+        )}
+        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Career Report</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {isLoading ? (
+              <div className="text-center">
+                <p>Generating your career report...</p>
+                <ProgressBar animated now={100} />
+              </div>
+            ) : (
+              <div style={{ whiteSpace: 'pre-line' }}>
+                {careerReport || 'Processing your answers...'}
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );
 };
 
-const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => {
-  return (
-    <header style={{ backgroundColor: 'blue', color: 'white', padding: '1rem', textAlign: 'center' }}>
-      <button onClick={() => setPage('home')}>Go to Home</button>
-    </header>
-  );
-};
+const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => (
+  <header className="app-header">
+    <h1>Career Quizine</h1>
+    <p>Your Ultimate Recipe for Career Success</p>
+    <button onClick={() => setPage('home')} className="home-button">Home</button>
+  </header>
+);
 
 const App: React.FC = () => {
-  const [key, setKey] = useState<string>(initialKeyData);
-  const [page, setPage] = useState<string>('home'); // Home page as default
+  const [page, setPage] = useState<string>('home');
+  const [apiKey, setApiKey] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const handleSubmit = () => {
-    localStorage.setItem(saveKeyData, JSON.stringify(key));
-    window.location.reload();
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('chatgptApiKey');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  const handleApiKeySubmit = (key: string) => {
+    localStorage.setItem('chatgptApiKey', key);
+    setApiKey(key);
+    setErrorMessage('');
   };
 
-  const changeKey = (event: React.ChangeEvent<HTMLInputElement>) => setKey(event.target.value);
+  const checkApiKey = async (): Promise<boolean> => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: 'test' }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid API key');
+      }
+
+      return true;
+    } catch (error) {
+      setErrorMessage('Invalid API key. Please check your API key and try again.');
+      return false;
+    }
+  };
+
+  const generateCareerReport = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
+    const isValidKey = await checkApiKey();
+    if (!isValidKey) {
+      throw new Error('Invalid API key');
+    }
+
+    const questionAnswerPairs = Object.entries(answers).map(([index, answer]) => {
+      const question = (quizType === 'basic' ? basicQuestions : detailedQuestions)[parseInt(index)].question;
+      return `${question}: ${answer}`;
+    });
+
+    const prompt = `Based on the following career quiz answers, please provide a detailed career analysis and recommendations:
+    ${questionAnswerPairs.join('\n')}
+    Please include: 1. Suggested career paths 2. Key strengths 3. Areas for development 4. Work environment preferences`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate career report');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  };
+
+  const handleQuizSubmit = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
+    try {
+      const report = await generateCareerReport(answers, quizType);
+      setErrorMessage('');
+      return report;
+    } catch (error) {
+      setErrorMessage('Error generating career report. Please check your API key and try again.');
+      throw error;
+    }
+  };
 
   return (
     <div className="App">
       <Header setPage={setPage} />
       {page === 'home' && (
-        <div>
+        <div className="home-container">
+          <APIKeyForm onSubmit={handleApiKeySubmit} apiKey={apiKey} />
+          {errorMessage && (
+            <div className="alert alert-danger" role="alert">
+              {errorMessage}
+            </div>
+          )}
           <h1>Welcome to the Career Quiz</h1>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ marginBottom: '20px' }}>
-              <Button variant="primary" onClick={() => setPage('detailed')}>
-                Detailed Questions
-              </Button>
-              <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
-            </div>
-            <div>
-              <Button variant="primary" onClick={() => setPage('basic')}>
-                Basic Questions
-              </Button>
-              <p>This is a shorter quiz intended for quick insights into potential career options.</p>
-            </div>
+          <div className="quiz-selection">
+            <Button variant="primary" onClick={() => setPage('detailed')}>
+              Detailed Questions
+            </Button>
+            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
+            <Button variant="primary" onClick={() => setPage('basic')}>
+              Basic Questions
+            </Button>
+            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
           </div>
-          <Form>
-            <Form.Label>API Key:</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Insert API Key Here"
-              value={key}
-              onChange={changeKey}
-            />
-            <br />
-            <Button className="Submit-Button" onClick={handleSubmit}>Submit</Button>
-          </Form>
         </div>
       )}
-      {page === 'basic' && <Questions questions={basicQuestions} />}
-      {page === 'detailed' && <Questions questions={detailedQuestions} />}
+      {page === 'basic' && (
+        <Questions 
+          questions={basicQuestions} 
+          quizType="basic"
+          onSubmit={(answers) => handleQuizSubmit(answers, 'basic')}
+        />
+      )}
+      {page === 'detailed' && (
+        <Questions 
+          questions={detailedQuestions} 
+          quizType="detailed"
+          onSubmit={(answers) => handleQuizSubmit(answers, 'detailed')}
+        />
+      )}
     </div>
   );
 };
