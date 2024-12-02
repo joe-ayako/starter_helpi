@@ -339,7 +339,6 @@ const App: React.FC = () => {
               {errorMessage}
             </div>
           )}
-          <h1>Welcome to the Career Quiz</h1>
           <div className="quiz-selection">
             <Button variant="primary" onClick={() => setPage('detailed')}>
               Detailed Questions
