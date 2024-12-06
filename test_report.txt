@@ -3,7 +3,7 @@
 > react-scripts test --coverage
 
 FAIL src/App.test.tsx
-  ✕ renders learn react link (41 ms)
+  ✕ renders learn react link (30 ms)
 
   ● renders learn react link
 
@@ -13,76 +13,26 @@ FAIL src/App.test.tsx
     [36m<body>[39m
       [36m<div>[39m
         [36m<div[39m
-          [33mclass[39m=[32m"App"[39m
+          [33mclass[39m=[32m"welcome-screen"[39m
         [36m>[39m
-          [36m<header[39m
-            [33mclass[39m=[32m"app-header"[39m
+          [36m<h1>[39m
+            [0mWelcome to Career Quizine[0m
+          [36m</h1>[39m
+          [36m<p>[39m
+            [0mBefore we help you find your perfect career path, let's have some fun![0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mCatch as many food items as you can to unlock your career assessment.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mUse the left and right arrow keys to move the basket.[0m
+          [36m</p>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"btn btn-primary btn-lg"[39m
+            [33mtype[39m=[32m"button"[39m
           [36m>[39m
-            [36m<h1>[39m
-              [0mCareer Quizine[0m
-            [36m</h1>[39m
-            [36m<p>[39m
-              [0mYour Ultimate Recipe for Career Success[0m
-            [36m</p>[39m
-            [36m<button[39m
-              [33mclass[39m=[32m"home-button"[39m
-            [36m>[39m
-              [0mHome[0m
-            [36m</button>[39m
-          [36m</header>[39m
-          [36m<div[39m
-            [33mclass[39m=[32m"home-container"[39m
-          [36m>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"api-key-form mb-4"[39m
-            [36m>[39m
-              [36m<form[39m
-                [33mclass[39m=[32m""[39m
-              [36m>[39m
-                [36m<div>[39m
-                  [36m<label[39m
-                    [33mclass[39m=[32m"form-label"[39m
-                  [36m>[39m
-                    [0mChatGPT API Key [0m
-                  [36m</label>[39m
-                  [36m<input[39m
-                    [33mclass[39m=[32m"form-control"[39m
-                    [33mplaceholder[39m=[32m"Enter your API key"[39m
-                    [33mtype[39m=[32m"password"[39m
-                    [33mvalue[39m=[32m""[39m
-                  [36m/>[39m
-                [36m</div>[39m
-                [36m<button[39m
-                  [33mclass[39m=[32m"mt-2 btn btn-primary"[39m
-                  [33mtype[39m=[32m"submit"[39m
-                [36m>[39m
-                  [0mSave API Key[0m
-                [36m</button>[39m
-              [36m</form>[39m
-            [36m</div>[39m
-            [36m<div[39m
-              [33mclass[39m=[32m"quiz-selection"[39m
-            [36m>[39m
-              [36m<button[39m
-                [33mclass[39m=[32m"btn btn-primary"[39m
-                [33mtype[39m=[32m"button"[39m
-              [36m>[39m
-                [0mDetailed Questions[0m
-              [36m</button>[39m
-              [36m<p>[39m
-                [0mThis is a longer quiz that will provide a more thorough look into your future career and possible paths.[0m
-              [36m</p>[39m
-              [36m<button[39m
-                [33mclass[39m=[32m"btn btn-primary"[39m
-                [33mtype[39m=[32m"button"[39m
-              [36m>[39m
-                [0mBasic Questions[0m
-              [36m</button>[39m
-              [36m<p>[39m
-                [0mThis is a shorter quiz intended for quick insights into potential career options.[0m
-              [36m</p>[39m
-            [36m</div>[39m
-          [36m</div>[39m
+            [0mStart Game[0m
+          [36m</button>[39m
         [36m</div>[39m
       [36m</div>[39m
     [36m</body>[39m
@@ -105,24 +55,25 @@ FAIL src/App.test.tsx
       at _run10000 (node_modules/@jest/core/build/cli/index.js:320:7)
       at runCLI (node_modules/@jest/core/build/cli/index.js:173:3)
 
----------------------|---------|----------|---------|---------|---------------------------------------------------------------------
-File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                   
----------------------|---------|----------|---------|---------|---------------------------------------------------------------------
-All files            |   19.81 |       25 |    12.9 |   20.79 |                                                                     
- src                 |   20.19 |       25 |   13.33 |   21.21 |                                                                     
-  App.tsx            |   22.58 |    27.77 |   14.28 |   23.86 | 103-105,116,134-224,238,250,255-257,261-281,286-317,321-327,343-365 
-  index.tsx          |       0 |      100 |     100 |       0 | 7-19                                                                
-  reportWebVitals.ts |       0 |        0 |       0 |       0 | 3-10                                                                
- src/Components      |       0 |      100 |       0 |       0 |                                                                     
-  Header.tsx         |       0 |      100 |       0 |       0 | 3-4                                                                 
- src/Pages           |       0 |        0 |       0 |       0 |                                                                     
-  Detailed.tsx       |       0 |        0 |       0 |       0 |                                                                     
-  Simple.tsx         |       0 |        0 |       0 |       0 |                                                                     
----------------------|---------|----------|---------|---------|---------------------------------------------------------------------
+---------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------
+File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                           
+---------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------
+All files            |    11.5 |     3.89 |    3.27 |   12.63 |                                                                             
+ src                 |    18.1 |     6.81 |    6.06 |   19.09 |                                                                             
+  App.tsx            |      20 |      7.5 |    6.45 |   21.21 | 100-116,134-250,261-264,277,282,286,290-292,296-312,317-348,352-358,378-412 
+  index.tsx          |       0 |      100 |     100 |       0 | 8-20                                                                        
+  reportWebVitals.ts |       0 |        0 |       0 |       0 | 3-10                                                                        
+ src/Components      |    2.38 |        0 |       0 |    2.77 |                                                                             
+  FoodCatchGame.tsx  |    2.43 |        0 |       0 |    2.85 | 16-154                                                                      
+  Header.tsx         |       0 |      100 |       0 |       0 | 3-4                                                                         
+ src/Pages           |       0 |        0 |       0 |       0 |                                                                             
+  Detailed.tsx       |       0 |        0 |       0 |       0 |                                                                             
+  Simple.tsx         |       0 |        0 |       0 |       0 |                                                                             
+---------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------
 Test Suites: 1 failed, 1 total
 Tests:       1 failed, 1 total
 Snapshots:   0 total
-Time:        3.019 s
+Time:        3.148 s
 Ran all test suites.
 [0;33mOne of your dependencies, babel-preset-react-app, is importing the
 "@babel/plugin-proposal-private-property-in-object" package without
