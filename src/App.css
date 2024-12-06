@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family:"Lucida Handwriting", Arial, sans-serif;
+  font-family: "Lucida Handwriting", Arial, sans-serif;
   color: #8F9E2C;
   background-color: #b5803a;
   display: flex;
@@ -78,6 +78,7 @@ body {
   border-radius: 12px;
   background-color: #F1F1F1;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  position: relative;
 }
 
 .question-text {
@@ -103,12 +104,12 @@ body {
 }
 
 .answer-option input[type="radio"] {
-  accent-color: #0071E3;
+  accent-color: #b5803a;
   cursor: pointer;
 }
 
 .answer-option:hover {
-  color: #0071E3;
+  color: #8F9E2C;
 }
 
 /* Navigation buttons */
@@ -124,20 +125,21 @@ button,
   padding: 0.6rem 1.5rem;
   font-size: 1rem;
   border-radius: 50px;
-  border: 1px solid #0071E3;
-  background-color: #0071E3;
+  border: 1px solid #b5803a;
+  background-color: #b5803a;
   color: #FFFFFF;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0px 4px 8px rgba(0, 113, 227, 0.2);
+  box-shadow: 0px 4px 8px rgba(181, 128, 58, 0.2);
   transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 button:hover,
 .nav-button:hover,
 .submit-button:hover {
-  background-color: #005BB5;
-  box-shadow: 0px 6px 12px rgba(0, 113, 227, 0.3);
+  background-color: #8F9E2C;
+  border-color: #8F9E2C;
+  box-shadow: 0px 6px 12px rgba(143, 158, 44, 0.3);
 }
 
 button:disabled,
@@ -151,18 +153,50 @@ button:disabled,
 
 /* Progress bar styling */
 .progress-bar {
-  background-color: #0071E3 !important;
   height: 12px;
   border-radius: 10px;
-  font-weight: bold;
-  color: #FFFFFF;
-  transition: width 0.4s ease;
+  background-color: #f5c17d !important;
   margin-top: 1.5rem;
+  overflow: hidden;
 }
 
-.progress-bar span {
-  font-size: 0.9rem;
-  line-height: 1.2rem;
+.progress-bar > div {
+  background-color: #b5803a !important;
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+/* Feedback message styling */
+.feedback-message {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-family: "Lucida Handwriting", Arial, sans-serif;
+  animation: fadeInOut 1.5s ease-in-out;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-message.success {
+  background-color: #8F9E2C;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feedback-message.error {
+  background-color: #b5803a;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  15% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
 }
 
 /* Modal styling */
@@ -186,12 +220,6 @@ button:disabled,
 .modal-body {
   font-size: 1.1rem;
   color: #6E6E73;
-}
-
-.modal-footer button {
-  padding: 0.6rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 8px;
 }
 
 /* API Key form styling */
@@ -219,44 +247,17 @@ button:disabled,
 }
 
 .api-key-form .api-input:focus {
-  border-color: #0071E3;
+  border-color: #b5803a;
   outline: none;
 }
 
-.Submit-Button {
-  background-color: #0071E3;
-  color: #FFF;
-  font-weight: bold;
-  padding: 0.7rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.Submit-Button:hover {
-  background-color: #005BB5;
-}
-
+/* Quiz selection styling */
 .quiz-selection {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
   margin-top: 2rem;
-}
-
-.quiz-selection .quiz-button {
-  background-color: #0071E3;
-  color: #FFF;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.quiz-selection .quiz-button:hover {
-  background-color: #005BB5;
 }
 
 .quiz-selection p {
@@ -266,3 +267,23 @@ button:disabled,
   max-width: 600px;
 }
 
+/* Loading state styling */
+.loading-text {
+  color: #8F9E2C;
+  font-family: "Lucida Handwriting", Arial, sans-serif;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Alert styling */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.alert-danger {
+  background-color: rgba(181, 128, 58, 0.1);
+  color: #b5803a;
+  border: 1px solid rgba(181, 128, 58, 0.2);
+}

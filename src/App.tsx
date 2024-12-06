@@ -146,41 +146,50 @@ interface QuestionsProps {
   onSubmit: (answers: { [key: number]: string }) => Promise<string>;
 }
 
-// Component for displaying and handling quiz questions
 const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [careerReport, setCareerReport] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  // Add these new state variables for feedback
+  const [feedbackMessage, setFeedbackMessage] = useState<string>('');
+  const [feedbackType, setFeedbackType] = useState<'success' | 'error'>('success');
 
-  // Load saved answers from localStorage when the component mounts
   useEffect(() => {
     const savedAnswers = JSON.parse(localStorage.getItem(`${quizType}QuizAnswers`) || '{}');
     setAnswers(savedAnswers);
   }, [quizType]);
 
-  // Handle navigation to the previous question
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
-  // Handle navigation to the next question
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
   
-  // Handle answer change
+  // Replace your existing handleAnswerChange function with this updated version
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
+    
+    // Add answer confirmation feedback
+    setFeedbackType('success');
+    setFeedbackMessage('Answer recorded successfully!');
+    setTimeout(() => setFeedbackMessage(''), 1500);
   };
 
-  // Handle quiz submission
+  // Replace your existing handleSubmit function with this updated version
   const handleSubmit = async () => {
     setIsLoading(true);
     setShowSubmitModal(true);
     localStorage.setItem(`${quizType}QuizAnswers`, JSON.stringify(answers));
+    
     try {
       const report = await onSubmit(answers);
       setCareerReport(report);
+      setFeedbackType('success');
+      setFeedbackMessage('Your responses have been processed successfully!');
     } catch (error) {
       setCareerReport("There was an error generating your career report. Please check your API key and try again.");
+      setFeedbackType('error');
+      setFeedbackMessage('Error processing responses. Please try again.');
     }
     setIsLoading(false);
   };
@@ -192,7 +201,13 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   return (
     <div className="quiz-container">
       <div className="question-card">
+        {feedbackMessage && (
+          <div className={`feedback-message ${feedbackType}`}>
+            {feedbackMessage}
+          </div>
+        )}
         <h2 className="question-text">{questions[currentQuestion].question}</h2>
+        {/* Rest of your existing JSX remains the same */}
         <div className="answers-list">
           {questions[currentQuestion].answers.map((answer, index) => (
             <label key={index} className="answer-option">
