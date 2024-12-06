@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Button, Form, ProgressBar, Modal } from 'react-bootstrap';
+import FoodCatchGame from './Components/FoodCatchGame';
 
 interface Question {
   question: string;
   answers: string[];
+}
+
+interface APIKeyFormProps {
+  onSubmit: (apiKey: string) => void;
+  apiKey: string;
 }
 
 interface QuestionsProps {
@@ -13,10 +19,6 @@ interface QuestionsProps {
   onSubmit: (answers: { [key: number]: string }) => Promise<string>;
 }
 
-interface APIKeyFormProps {
-  onSubmit: (apiKey: string) => void;
-  apiKey: string;
-}
 
 const basicQuestions: Question[] = [
   { question: 'What type of work environment do you prefer?', answers: ['Fast-paced', 'Structured', 'Flexible', 'Collaborative'] },
@@ -27,7 +29,6 @@ const basicQuestions: Question[] = [
   { question: 'What industry interests you most?', answers: ['Technology', 'Healthcare', 'Business', 'Arts'] },
   { question: 'How do you approach new challenges?', answers: ['By researching solutions', 'By collaborating with others', 'By brainstorming ideas', 'By diving in and adjusting as needed'] },
 ];
-
 
 const detailedQuestions: Question[] = [
   { 
@@ -50,7 +51,6 @@ const detailedQuestions: Question[] = [
   },
   { 
     question: 'What role do you enjoy playing in team projects?', 
-
     answers: [
       'I like to lead and organize tasks for the team.',
       'I prefer being a supportive team member, helping others when needed.',
@@ -136,6 +136,8 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [careerReport, setCareerReport] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string>('');
+  const [feedbackType, setFeedbackType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     const savedAnswers = JSON.parse(localStorage.getItem(`${quizType}QuizAnswers`) || '{}');
@@ -148,28 +150,38 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
+    
+    setFeedbackType('success');
+    setFeedbackMessage('Answer recorded successfully!');
+    setTimeout(() => setFeedbackMessage(''), 1100);
   };
 
   const handleSubmit = async () => {
     setIsLoading(true);
     setShowSubmitModal(true);
     localStorage.setItem(`${quizType}QuizAnswers`, JSON.stringify(answers));
+    
     try {
       const report = await onSubmit(answers);
       setCareerReport(report);
+      setFeedbackType('success');
+      setFeedbackMessage('Your responses have been processed successfully!');
     } catch (error) {
-      setCareerReport("There was an error generating your career report. Please check your API key and try again.");
+      setCareerReport("Generating your career report, please wait...");
+      setFeedbackType('error');
+      setFeedbackMessage('Error processing responses. Please try again.');
     }
     setIsLoading(false);
   };
 
-  const answeredQuestions = Object.keys(answers).length;
-  const progress = Math.round((answeredQuestions / questions.length) * 100);
-  const allAnswered = answeredQuestions === questions.length;
-
   return (
     <div className="quiz-container">
       <div className="question-card">
+        {feedbackMessage && (
+          <div className={`feedback-message ${feedbackType}`}>
+            {feedbackMessage}
+          </div>
+        )}
         <h2 className="question-text">{questions[currentQuestion].question}</h2>
         <div className="answers-list">
           {questions[currentQuestion].answers.map((answer, index) => (
@@ -186,15 +198,29 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
           ))}
         </div>
         <div className="navigation-buttons">
-          <Button onClick={handlePrevious} disabled={currentQuestion === 0} variant="outline-primary">
+          <Button 
+            onClick={handlePrevious} 
+            disabled={currentQuestion === 0} 
+            variant="outline-primary"
+          >
             Previous
           </Button>
-          <Button onClick={handleNext} disabled={currentQuestion === questions.length - 1} variant="outline-primary">
+          <div className="question-counter">
+            Question {currentQuestion + 1} of {questions.length}
+          </div>
+          <Button 
+            onClick={handleNext} 
+            disabled={currentQuestion === questions.length - 1} 
+            variant="outline-primary"
+          >
             Next
           </Button>
         </div>
-        <ProgressBar now={progress} label={`${progress}%`} className="progress-bar" />
-        {allAnswered && (
+        <ProgressBar 
+          now={((currentQuestion + 1) / questions.length) * 100} 
+          label={`${Math.round(((currentQuestion + 1) / questions.length) * 100)}%`} 
+        />
+        {currentQuestion === questions.length - 1 && (
           <Button 
             variant="success" 
             onClick={handleSubmit} 
@@ -240,9 +266,10 @@ const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }
 );
 
 const App: React.FC = () => {
-  const [page, setPage] = useState<string>('home');
+  const [page, setPage] = useState<string>('game');
   const [apiKey, setApiKey] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showWelcome, setShowWelcome] = useState<boolean>(true);
 
   useEffect(() => {
     const savedApiKey = localStorage.getItem('chatgptApiKey');
@@ -250,6 +277,14 @@ const App: React.FC = () => {
       setApiKey(savedApiKey);
     }
   }, []);
+
+  const handleGameComplete = () => {
+    setPage('home');
+  };
+
+  const startGame = () => {
+    setShowWelcome(false);
+  };
 
   const handleApiKeySubmit = (key: string) => {
     localStorage.setItem('chatgptApiKey', key);
@@ -271,11 +306,7 @@ const App: React.FC = () => {
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Invalid API key');
-      }
-
-      return true;
+      return response.ok;
     } catch (error) {
       setErrorMessage('Invalid API key. Please check your API key and try again.');
       return false;
@@ -328,6 +359,22 @@ const App: React.FC = () => {
     }
   };
 
+  if (page === 'game') {
+    return showWelcome ? (
+      <div className="welcome-screen">
+        <h1>Welcome to Career Quizine</h1>
+        <p>Before we help you find your perfect career path, let's have some fun!</p>
+        <p>Catch as many food items as you can to unlock your career assessment.</p>
+        <p>Use the left and right arrow keys to move the basket.</p>
+        <Button variant="primary" size="lg" onClick={startGame}>
+          Start Game
+        </Button>
+      </div>
+    ) : (
+      <FoodCatchGame onGameComplete={handleGameComplete} />
+    );
+  }
+
   return (
     <div className="App">
       <Header setPage={setPage} />
@@ -341,13 +388,13 @@ const App: React.FC = () => {
           )}
           <div className="quiz-selection">
             <Button variant="primary" onClick={() => setPage('detailed')}>
-              Detailed Questions
+              Detailed Career Assessment
             </Button>
-            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
+            <p>Take a comprehensive quiz for thorough career path insights.</p>
             <Button variant="primary" onClick={() => setPage('basic')}>
-              Basic Questions
+              Quick Career Assessment
             </Button>
-            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
+            <p>Get quick insights into potential career options.</p>
           </div>
         </div>
       )}
