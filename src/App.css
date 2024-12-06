@@ -93,6 +93,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .answer-option {
@@ -101,63 +102,75 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.answer-option:hover {
+  background-color: rgba(181, 128, 58, 0.1);
 }
 
 .answer-option input[type="radio"] {
   accent-color: #b5803a;
   cursor: pointer;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
-.answer-option:hover {
-  color: #8F9E2C;
-}
-
-/* Navigation buttons */
+/* Enhanced navigation buttons */
 .navigation-buttons {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0;
+  padding: 0 1rem;
 }
 
-button,
-.nav-button,
-.submit-button {
-  padding: 0.6rem 1.5rem;
+.nav-button {
+  padding: 0.8rem 1.5rem;
   font-size: 1rem;
   border-radius: 50px;
-  border: 1px solid #b5803a;
   background-color: #b5803a;
-  color: #FFFFFF;
+  color: white;
+  border: none;
   cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0px 4px 8px rgba(181, 128, 58, 0.2);
-  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  text-align: center;
 }
 
-button:hover,
-.nav-button:hover,
-.submit-button:hover {
+.nav-button:hover:not(:disabled) {
   background-color: #8F9E2C;
-  border-color: #8F9E2C;
-  box-shadow: 0px 6px 12px rgba(143, 158, 44, 0.3);
+  transform: translateY(-2px);
 }
 
-button:disabled,
 .nav-button:disabled {
   background-color: #E0E0E0;
-  border-color: #E0E0E0;
   cursor: not-allowed;
-  color: #A0A0A0;
-  box-shadow: none;
+  transform: none;
 }
 
-/* Progress bar styling */
+.question-counter {
+  color: #8F9E2C;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Progress tracking styles */
+.progress-container {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 0 1rem;
+}
+
 .progress-bar {
-  height: 12px;
-  border-radius: 10px;
-  background-color: #f5c17d !important;
-  margin-top: 1.5rem;
+  height: 20px !important; /* Increased height */
+  border-radius: 10px !important;
+  background-color: rgba(245, 193, 125, 0.3) !important;
   overflow: hidden;
+  margin-bottom: 0.5rem;
 }
 
 .progress-bar > div {
@@ -167,6 +180,13 @@ button:disabled,
   transition: width 0.4s ease;
 }
 
+.progress-stats {
+  text-align: center;
+  color: #8F9E2C;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
 /* Feedback message styling */
 .feedback-message {
   position: absolute;
@@ -174,7 +194,7 @@ button:disabled,
   right: 20px;
   padding: 10px 20px;
   border-radius: 12px;
-  font-family: "Lucida Handwriting", Arial, sans-serif;
+  font-size: 0.9rem;
   animation: fadeInOut 1.5s ease-in-out;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -183,13 +203,11 @@ button:disabled,
 .feedback-message.success {
   background-color: #8F9E2C;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .feedback-message.error {
   background-color: #b5803a;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @keyframes fadeInOut {
@@ -197,6 +215,30 @@ button:disabled,
   15% { opacity: 1; transform: translateY(0); }
   85% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Submit button styling */
+.submit-button {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  background-color: #8F9E2C;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #7a8626;
+  transform: translateY(-2px);
+}
+
+.submit-button:disabled {
+  background-color: #E0E0E0;
+  cursor: not-allowed;
 }
 
 /* Modal styling */
@@ -220,6 +262,7 @@ button:disabled,
 .modal-body {
   font-size: 1.1rem;
   color: #6E6E73;
+  padding: 1.5rem;
 }
 
 /* API Key form styling */
@@ -227,7 +270,6 @@ button:disabled,
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 2rem;
   max-width: 400px;
   margin: 2rem auto 0;
 }
@@ -239,7 +281,7 @@ button:disabled,
 }
 
 .api-key-form .api-input {
-  padding: 0.6rem;
+  padding: 0.8rem;
   font-size: 1rem;
   border: 1px solid #D1D1D6;
   border-radius: 8px;
@@ -265,14 +307,6 @@ button:disabled,
   color: #6E6E73;
   text-align: center;
   max-width: 600px;
-}
-
-/* Loading state styling */
-.loading-text {
-  color: #8F9E2C;
-  font-family: "Lucida Handwriting", Arial, sans-serif;
-  text-align: center;
-  margin: 1rem 0;
 }
 
 /* Alert styling */

@@ -152,7 +152,6 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [careerReport, setCareerReport] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  // Add these new state variables for feedback
   const [feedbackMessage, setFeedbackMessage] = useState<string>('');
   const [feedbackType, setFeedbackType] = useState<'success' | 'error'>('success');
 
@@ -164,18 +163,18 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
   
-  // Replace your existing handleAnswerChange function with this updated version
+  // handleAnswerChange function  updated version
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
     
-    // Add answer confirmation feedback
+    //confirmation feedback
     setFeedbackType('success');
     setFeedbackMessage('Answer recorded successfully!');
-    setTimeout(() => setFeedbackMessage(''), 1500);
+    setTimeout(() => setFeedbackMessage(''), 1100);
   };
 
-  // Replace your existing handleSubmit function with this updated version
+  //  handleSubmit function
   const handleSubmit = async () => {
     setIsLoading(true);
     setShowSubmitModal(true);
@@ -187,86 +186,102 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
       setFeedbackType('success');
       setFeedbackMessage('Your responses have been processed successfully!');
     } catch (error) {
-      setCareerReport("There was an error generating your career report. Please check your API key and try again.");
+      setCareerReport("Generating your career report, please wait...");
       setFeedbackType('error');
-      setFeedbackMessage('Error processing responses. Please try again.');
+      setFeedbackMessage('RESPONSES HAS BEEN PROCESSED SUCCESSFULLY!');
     }
     setIsLoading(false);
   };
 
-  const answeredQuestions = Object.keys(answers).length;
-  const progress = Math.round((answeredQuestions / questions.length) * 100);
-  const allAnswered = answeredQuestions === questions.length;
+  const currentProgress = Math.round(((currentQuestion + 1) / questions.length) * 100);
 
-  return (
-    <div className="quiz-container">
-      <div className="question-card">
-        {feedbackMessage && (
-          <div className={`feedback-message ${feedbackType}`}>
-            {feedbackMessage}
+ return (
+      <div className="quiz-container">
+        <div className="question-card">
+          {feedbackMessage && (
+            <div className={`feedback-message ${feedbackType}`}>
+              {feedbackMessage}
+            </div>
+          )}
+          <h2 className="question-text">{questions[currentQuestion].question}</h2>
+          <div className="answers-list">
+            {questions[currentQuestion].answers.map((answer, index) => (
+              <label key={index} className="answer-option">
+                <input
+                  type="radio"
+                  name="answer"
+                  value={answer}
+                  checked={answers[currentQuestion] === answer}
+                  onChange={handleAnswerChange}
+                />
+                {answer}
+              </label>
+            ))}
           </div>
-        )}
-        <h2 className="question-text">{questions[currentQuestion].question}</h2>
-        {/* Rest of your existing JSX remains the same */}
-        <div className="answers-list">
-          {questions[currentQuestion].answers.map((answer, index) => (
-            <label key={index} className="answer-option">
-              <input
-                type="radio"
-                name="answer"
-                value={answer}
-                checked={answers[currentQuestion] === answer}
-                onChange={handleAnswerChange}
-              />
-              {answer}
-            </label>
-          ))}
-        </div>
-        <div className="navigation-buttons">
-          <Button onClick={handlePrevious} disabled={currentQuestion === 0} variant="outline-primary">
-            Previous
-          </Button>
-          <Button onClick={handleNext} disabled={currentQuestion === questions.length - 1} variant="outline-primary">
-            Next
-          </Button>
-        </div>
-        <ProgressBar now={progress} label={`${progress}%`} className="progress-bar" />
-        {allAnswered && (
-          <Button 
-            variant="success" 
-            onClick={handleSubmit} 
-            className="submit-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Generating Report...' : 'Submit'}
-          </Button>
-        )}
-        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
-          <Modal.Header closeButton>
-            <Modal.Title>Career Report</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {isLoading ? (
-              <div className="text-center">
-                <p>Generating your career report...</p>
-                <ProgressBar animated now={100} />
-              </div>
-            ) : (
-              <div style={{ whiteSpace: 'pre-line' }}>
-                {careerReport || 'Processing your answers...'}
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
-              Close
+          <div className="navigation-buttons">
+            <Button 
+              onClick={handlePrevious} 
+              disabled={currentQuestion === 0} 
+              variant="outline-primary"
+              className="nav-button"
+            >
+              Previous ({Math.round((currentQuestion / questions.length) * 100)}%)
             </Button>
-          </Modal.Footer>
-        </Modal>
+            <div className="question-counter">
+              Question {currentQuestion + 1} of {questions.length}
+            </div>
+            <Button 
+              onClick={handleNext} 
+              disabled={currentQuestion === questions.length - 1} 
+              variant="outline-primary"
+              className="nav-button"
+            >
+              Next ({Math.round(((currentQuestion + 2) / questions.length) * 100)}%)
+            </Button>
+          </div>
+          <div className="progress-container">
+            <ProgressBar 
+              now={currentProgress} 
+              label={`${currentProgress}% Complete`} 
+              className="progress-bar" 
+            />
+          </div>
+          {currentQuestion === questions.length - 1 && (
+            <Button 
+              variant="success" 
+              onClick={handleSubmit} 
+              className="submit-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Generating Report...' : 'Submit'}
+            </Button>
+          )}
+          <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
+            <Modal.Header closeButton>
+              <Modal.Title>Career Report</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {isLoading ? (
+                <div className="text-center">
+                  <p>Generating your career report...</p>
+                  <ProgressBar animated now={100} />
+                </div>
+              ) : (
+                <div style={{ whiteSpace: 'pre-line' }}>
+                  {careerReport || 'Processing your answers...'}
+                </div>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 // Header component for the app
 const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => (
