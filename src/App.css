@@ -1,4 +1,3 @@
-/* Reset for consistency across browsers */
 *,
 *::before,
 *::after {
@@ -18,7 +17,7 @@ body {
   padding: 20px;
 }
 
-/* Main container for app */
+/* Main Container Styles */
 .App {
   max-width: 1000px;
   width: 100%;
@@ -33,7 +32,7 @@ body {
   transform: translateY(-5px);
 }
 
-/* Header styling */
+/* Header Styles */
 .app-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -62,6 +61,113 @@ body {
 
 .home-button:hover {
   color: #DFAA64;
+}
+
+/* Game Container Styles */
+.game-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  background: #f5c17d;
+  padding: 20px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #8F9E2C;
+}
+
+.game-area {
+  width: 80%;
+  height: 600px;
+  background: #F1F1F1;
+  position: relative;
+  border: 2px solid #b5803a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.food-item {
+  position: absolute;
+  font-size: 24px;
+  transform: translate(-50%, -50%);
+  transition: top 0.016s linear;
+}
+
+.basket {
+  position: absolute;
+  bottom: 20px;
+  font-size: 32px;
+  transform: translateX(-50%);
+  transition: left 0.016s linear;
+}
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(245, 193, 125, 0.95);
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.game-instructions {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #8F9E2C;
+}
+
+/* Welcome Screen Styles */
+.welcome-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  background: #f5c17d;
+}
+
+.welcome-screen h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #8F9E2C;
+}
+
+.welcome-screen p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #b5803a;
+  max-width: 600px;
+}
+
+.welcome-screen button {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #8F9E2C;
+  border: none;
+  border-radius: 50px;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.welcome-screen button:hover {
+  transform: scale(1.05);
+  background-color: #7a8626;
 }
 
 /* Quiz container */

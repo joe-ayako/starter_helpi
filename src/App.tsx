@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react'; // Importing necessary hooks from React
-import './App.css'; // Importing the CSS file for styling
-import { Button, Form, ProgressBar, Modal } from 'react-bootstrap'; // Importing components from react-bootstrap
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import { Button, Form, ProgressBar, Modal } from 'react-bootstrap';
+import FoodCatchGame from './Components/FoodCatchGame';
 
-// Defining the structure of a Question object
 interface Question {
-  question: string; // The question text
-  answers: string[]; // An array of possible answers
+  question: string;
+  answers: string[];
 }
 
-// Defining the props for a component that will handle questions
-interface QuestionsProps {
-  questions: Question[]; // An array of Question objects
-  quizType: 'basic' | 'detailed'; // The type of quiz, either 'basic' or 'detailed'
-  onSubmit: (answers: { [key: number]: string }) => Promise<string>; // A function to handle form submission, returns a Promise with a string
-}
-
-// Defining the props for a component that will handle API key submission
 interface APIKeyFormProps {
-  onSubmit: (apiKey: string) => void; // A function to handle API key submission
-  apiKey: string; // The API key as a string
+  onSubmit: (apiKey: string) => void;
+  apiKey: string;
 }
+
+interface QuestionsProps {
+  questions: Question[];
+  quizType: 'basic' | 'detailed';
+  onSubmit: (answers: { [key: number]: string }) => Promise<string>;
+}
+
+
 const basicQuestions: Question[] = [
   { question: 'What type of work environment do you prefer?', answers: ['Fast-paced', 'Structured', 'Flexible', 'Collaborative'] },
   { question: 'How would you describe your ideal job?', answers: ['Creative', 'Analytical', 'Hands-on', 'People-oriented'] },
@@ -30,7 +30,6 @@ const basicQuestions: Question[] = [
   { question: 'How do you approach new challenges?', answers: ['By researching solutions', 'By collaborating with others', 'By brainstorming ideas', 'By diving in and adjusting as needed'] },
 ];
 
-// Define the detailed questions array
 const detailedQuestions: Question[] = [
   { 
     question: 'When working on a project, what approach do you usually take to problem-solving?', 
@@ -97,17 +96,9 @@ const detailedQuestions: Question[] = [
   }
 ];
 
-// Define the props for the APIKeyForm component
-interface APIKeyFormProps {
-  onSubmit: (apiKey: string) => void;
-  apiKey: string;
-}
-
-// Component for handling API key input and submission
 const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
   const [newApiKey, setNewApiKey] = useState<string>('');
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(newApiKey);
@@ -139,13 +130,6 @@ const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
   );
 };
 
-// Define the props for the Questions component
-interface QuestionsProps {
-  questions: Question[];
-  quizType: 'basic' | 'detailed';
-  onSubmit: (answers: { [key: number]: string }) => Promise<string>;
-}
-
 const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -163,18 +147,15 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
   const handlePrevious = () => setCurrentQuestion((prev) => Math.max(prev - 1, 0));
   const handleNext = () => setCurrentQuestion((prev) => Math.min(prev + 1, questions.length - 1));
   
-  // handleAnswerChange function  updated version
   const handleAnswerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setAnswers((prevAnswers) => ({ ...prevAnswers, [currentQuestion]: value }));
     
-    //confirmation feedback
     setFeedbackType('success');
     setFeedbackMessage('Answer recorded successfully!');
     setTimeout(() => setFeedbackMessage(''), 1100);
   };
 
-  //  handleSubmit function
   const handleSubmit = async () => {
     setIsLoading(true);
     setShowSubmitModal(true);
@@ -188,102 +169,94 @@ const Questions: React.FC<QuestionsProps> = ({ questions, quizType, onSubmit }) 
     } catch (error) {
       setCareerReport("Generating your career report, please wait...");
       setFeedbackType('error');
-      setFeedbackMessage('RESPONSES HAS BEEN PROCESSED SUCCESSFULLY!');
+      setFeedbackMessage('Error processing responses. Please try again.');
     }
     setIsLoading(false);
   };
 
-  const currentProgress = Math.round(((currentQuestion + 1) / questions.length) * 100);
-
- return (
-      <div className="quiz-container">
-        <div className="question-card">
-          {feedbackMessage && (
-            <div className={`feedback-message ${feedbackType}`}>
-              {feedbackMessage}
-            </div>
-          )}
-          <h2 className="question-text">{questions[currentQuestion].question}</h2>
-          <div className="answers-list">
-            {questions[currentQuestion].answers.map((answer, index) => (
-              <label key={index} className="answer-option">
-                <input
-                  type="radio"
-                  name="answer"
-                  value={answer}
-                  checked={answers[currentQuestion] === answer}
-                  onChange={handleAnswerChange}
-                />
-                {answer}
-              </label>
-            ))}
+  return (
+    <div className="quiz-container">
+      <div className="question-card">
+        {feedbackMessage && (
+          <div className={`feedback-message ${feedbackType}`}>
+            {feedbackMessage}
           </div>
-          <div className="navigation-buttons">
-            <Button 
-              onClick={handlePrevious} 
-              disabled={currentQuestion === 0} 
-              variant="outline-primary"
-              className="nav-button"
-            >
-              Previous ({Math.round((currentQuestion / questions.length) * 100)}%)
-            </Button>
-            <div className="question-counter">
-              Question {currentQuestion + 1} of {questions.length}
-            </div>
-            <Button 
-              onClick={handleNext} 
-              disabled={currentQuestion === questions.length - 1} 
-              variant="outline-primary"
-              className="nav-button"
-            >
-              Next ({Math.round(((currentQuestion + 2) / questions.length) * 100)}%)
-            </Button>
-          </div>
-          <div className="progress-container">
-            <ProgressBar 
-              now={currentProgress} 
-              label={`${currentProgress}% Complete`} 
-              className="progress-bar" 
-            />
-          </div>
-          {currentQuestion === questions.length - 1 && (
-            <Button 
-              variant="success" 
-              onClick={handleSubmit} 
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Generating Report...' : 'Submit'}
-            </Button>
-          )}
-          <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
-            <Modal.Header closeButton>
-              <Modal.Title>Career Report</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {isLoading ? (
-                <div className="text-center">
-                  <p>Generating your career report...</p>
-                  <ProgressBar animated now={100} />
-                </div>
-              ) : (
-                <div style={{ whiteSpace: 'pre-line' }}>
-                  {careerReport || 'Processing your answers...'}
-                </div>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
+        )}
+        <h2 className="question-text">{questions[currentQuestion].question}</h2>
+        <div className="answers-list">
+          {questions[currentQuestion].answers.map((answer, index) => (
+            <label key={index} className="answer-option">
+              <input
+                type="radio"
+                name="answer"
+                value={answer}
+                checked={answers[currentQuestion] === answer}
+                onChange={handleAnswerChange}
+              />
+              {answer}
+            </label>
+          ))}
         </div>
+        <div className="navigation-buttons">
+          <Button 
+            onClick={handlePrevious} 
+            disabled={currentQuestion === 0} 
+            variant="outline-primary"
+          >
+            Previous
+          </Button>
+          <div className="question-counter">
+            Question {currentQuestion + 1} of {questions.length}
+          </div>
+          <Button 
+            onClick={handleNext} 
+            disabled={currentQuestion === questions.length - 1} 
+            variant="outline-primary"
+          >
+            Next
+          </Button>
+        </div>
+        <ProgressBar 
+          now={((currentQuestion + 1) / questions.length) * 100} 
+          label={`${Math.round(((currentQuestion + 1) / questions.length) * 100)}%`} 
+        />
+        {currentQuestion === questions.length - 1 && (
+          <Button 
+            variant="success" 
+            onClick={handleSubmit} 
+            className="submit-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Generating Report...' : 'Submit'}
+          </Button>
+        )}
+        <Modal show={showSubmitModal} onHide={() => setShowSubmitModal(false)} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Career Report</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {isLoading ? (
+              <div className="text-center">
+                <p>Generating your career report...</p>
+                <ProgressBar animated now={100} />
+              </div>
+            ) : (
+              <div style={{ whiteSpace: 'pre-line' }}>
+                {careerReport || 'Processing your answers...'}
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowSubmitModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-// Header component for the app
 const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }> = ({ setPage }) => (
   <header className="app-header">
     <h1>Career Quizine</h1>
@@ -292,13 +265,12 @@ const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }
   </header>
 );
 
-// Main App component
 const App: React.FC = () => {
-  const [page, setPage] = useState<string>('home');
+  const [page, setPage] = useState<string>('game');
   const [apiKey, setApiKey] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [showWelcome, setShowWelcome] = useState<boolean>(true);
 
-  // Load saved API key from localStorage when the component mounts
   useEffect(() => {
     const savedApiKey = localStorage.getItem('chatgptApiKey');
     if (savedApiKey) {
@@ -306,14 +278,20 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Handle API key submission
+  const handleGameComplete = () => {
+    setPage('home');
+  };
+
+  const startGame = () => {
+    setShowWelcome(false);
+  };
+
   const handleApiKeySubmit = (key: string) => {
     localStorage.setItem('chatgptApiKey', key);
     setApiKey(key);
     setErrorMessage('');
   };
 
-  // Check if the API key is valid
   const checkApiKey = async (): Promise<boolean> => {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -328,25 +306,13 @@ const App: React.FC = () => {
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Invalid API key');
-      }
-
-      return true;
+      return response.ok;
     } catch (error) {
       setErrorMessage('Invalid API key. Please check your API key and try again.');
       return false;
     }
   };
 
-  /**
-   * Generates a career report based on the user's quiz answers.
-   * 
-   * @param {{ [key: number]: string }} answers - The user's answers to the quiz questions.
-   * @param {'basic' | 'detailed'} quizType - The type of quiz ('basic' or 'detailed').
-   * @returns {Promise<string>} A promise that resolves to the generated career report.
-   * @throws {Error} Throws an error if the API key is invalid or the report generation fails.
-   */
   const generateCareerReport = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
     const isValidKey = await checkApiKey();
     if (!isValidKey) {
@@ -382,7 +348,6 @@ const App: React.FC = () => {
     return data.choices[0].message.content;
   };
 
-  // Handle quiz submission
   const handleQuizSubmit = async (answers: { [key: number]: string }, quizType: 'basic' | 'detailed'): Promise<string> => {
     try {
       const report = await generateCareerReport(answers, quizType);
@@ -393,6 +358,22 @@ const App: React.FC = () => {
       throw error;
     }
   };
+
+  if (page === 'game') {
+    return showWelcome ? (
+      <div className="welcome-screen">
+        <h1>Welcome to Career Quizine</h1>
+        <p>Before we help you find your perfect career path, let's have some fun!</p>
+        <p>Catch as many food items as you can to unlock your career assessment.</p>
+        <p>Use the left and right arrow keys to move the basket.</p>
+        <Button variant="primary" size="lg" onClick={startGame}>
+          Start Game
+        </Button>
+      </div>
+    ) : (
+      <FoodCatchGame onGameComplete={handleGameComplete} />
+    );
+  }
 
   return (
     <div className="App">
@@ -407,13 +388,13 @@ const App: React.FC = () => {
           )}
           <div className="quiz-selection">
             <Button variant="primary" onClick={() => setPage('detailed')}>
-              Detailed Questions
+              Detailed Career Assessment
             </Button>
-            <p>This is a longer quiz that will provide a more thorough look into your future career and possible paths.</p>
+            <p>Take a comprehensive quiz for thorough career path insights.</p>
             <Button variant="primary" onClick={() => setPage('basic')}>
-              Basic Questions
+              Quick Career Assessment
             </Button>
-            <p>This is a shorter quiz intended for quick insights into potential career options.</p>
+            <p>Get quick insights into potential career options.</p>
           </div>
         </div>
       )}
