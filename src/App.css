@@ -225,6 +225,7 @@ body {
 }
 
 /* Enhanced navigation buttons */
+
 .navigation-buttons {
   display: flex;
   justify-content: space-between;
@@ -255,6 +256,27 @@ body {
   background-color: #E0E0E0;
   cursor: not-allowed;
   transform: none;
+}
+
+.app-header .header-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.about-button {
+  color: #bd7415;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.about-button:hover {
+  color: #DFAA64;
 }
 
 .question-counter {
@@ -426,4 +448,93 @@ body {
   background-color: rgba(181, 128, 58, 0.1);
   color: #b5803a;
   border: 1px solid rgba(181, 128, 58, 0.2);
+}
+
+/* about page styling*/
+
+.about-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: #F1F1F1;
+  border-radius: 12px;
+}
+
+.about-intro {
+  text-align: center;
+  max-width: 800px;
+}
+
+.about-intro h2 {
+  color: #8F9E2C;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about-intro p {
+  color: #6E6E73;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.team-section {
+  width: 100%;
+  text-align: center;
+}
+
+.team-section h3 {
+  color: #b5803a;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+}
+
+.team-members {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.team-member {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 300px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+  transform: translateY(-10px);
+}
+
+.member-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: rgba(181, 128, 58, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 4rem;
+}
+
+.member-details h4 {
+  color: #8F9E2C;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.member-details h5 {
+  color: #b5803a;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.member-details p {
+  color: #6E6E73;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }

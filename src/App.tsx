@@ -96,6 +96,56 @@ const detailedQuestions: Question[] = [
   }
 ];
 
+const AboutPage: React.FC = () => {
+  const teamMembers = [
+    {
+      name: 'Joe',
+      role: 'Founder & Career Strategist',
+      bio: 'Joe brings years of career counseling experience to Career Quizine.',
+      imagePath: `${process.env.PUBLIC_URL}/joe.jpg`, 
+    },
+    {
+      name: 'Angel',
+      role: 'UX Design & Research Lead',
+      bio: 'Angel creates intuitive, engaging user experiences.',
+      imagePath: `${process.env.PUBLIC_URL}/angel.jpg`,
+    },
+    {
+      name: 'Axel',
+      role: 'Technology & AI Specialist',
+      bio: 'Axel powers the intelligent recommendation engine with AI.',
+      imagePath: `${process.env.PUBLIC_URL}/axel.png`,
+    },
+  ];
+
+  return (
+    <div className="about-page">
+      <h2>Meet Our Team</h2>
+      <div className="team-members">
+        {teamMembers.map((member, index) => (
+          <div key={index} className="team-member">
+            <img
+              src={member.imagePath}
+              alt={`${member.name}'s photo`}
+              style={{
+                width: '150px',
+                height: '150px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+              }}
+            />
+            <h4>{member.name}</h4>
+            <p>{member.role}</p>
+            <p>{member.bio}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
+
 const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
   const [newApiKey, setNewApiKey] = useState<string>('');
 
@@ -261,7 +311,10 @@ const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }
   <header className="app-header">
     <h1>Career Quizine</h1>
     <p>Your Ultimate Recipe for Career Success</p>
-    <button onClick={() => setPage('home')} className="home-button">Home</button>
+    <div className="header-nav">
+      <button onClick={() => setPage('home')} className="home-button">Home</button>
+      <button onClick={() => setPage('about')} className="about-button">About</button>
+    </div>
   </header>
 );
 
@@ -366,14 +419,20 @@ const App: React.FC = () => {
         <p>Before we help you find your perfect career path, let's have some fun!</p>
         <p>Catch as many food items as you can to unlock your career assessment.</p>
         <p>Use the left and right arrow keys to move the basket.</p>
-        <Button variant="primary" size="lg" onClick={startGame}>
-          Start Game
-        </Button>
+        <div className="welcome-buttons">
+          <Button variant="primary" size="lg" onClick={startGame}>
+            Start Game
+          </Button>
+          <Button variant="secondary" size="lg" onClick={() => setPage('home')} className="ml-3">
+            Skip to Home
+          </Button>
+        </div>
       </div>
     ) : (
       <FoodCatchGame onGameComplete={handleGameComplete} />
     );
   }
+  
 
   return (
     <div className="App">
@@ -412,6 +471,7 @@ const App: React.FC = () => {
           onSubmit={(answers) => handleQuizSubmit(answers, 'detailed')}
         />
       )}
+      {page === 'about' && <AboutPage />}
     </div>
   );
 };
