@@ -96,6 +96,62 @@ const detailedQuestions: Question[] = [
   }
 ];
 
+const AboutPage: React.FC = () => {
+  const teamMembers = [
+    {
+      name: 'Person 1',
+      role: 'Founder & Career Strategist',
+      bio: 'With a passion for helping individuals discover their true potential, Person 1 brings years of career counseling experience to Career Quizine. Their innovative approach combines psychological insights with practical career guidance.',
+      imagePlaceholder: '👩‍💼' // Replace with actual image or path later
+    },
+    {
+      name: 'Person 2', 
+      role: 'UX Design & Research Lead',
+      bio: 'Person 2 is dedicated to creating intuitive, engaging user experiences. Their background in design psychology ensures that Career Quizine provides not just insights, but an enjoyable journey of self-discovery.',
+      imagePlaceholder: '👨‍💻'
+    },
+    {
+      name: 'Person 3',
+      role: 'Technology & AI Specialist',
+      bio: 'A tech innovator with a deep understanding of AI and machine learning, Person 3 powers the intelligent recommendation engine behind Career Quizine, turning complex data into actionable career insights.',
+      imagePlaceholder: '🧑‍💻'
+    }
+  ];
+
+  return (
+    <div className="about-page">
+      <div className="about-intro">
+        <h2>About Career Quizine</h2>
+        <p>
+          Career Quizine is more than just a career assessment tool—it's a recipe for professional success. 
+          We believe that finding the right career path should be an enjoyable, insightful journey. 
+          By blending cutting-edge AI technology with deep psychological insights, 
+          we help individuals uncover their unique professional potential.
+        </p>
+      </div>
+      
+      <div className="team-section">
+        <h3>Meet Our Team</h3>
+        <div className="team-members">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="team-member">
+              <div className="member-image">
+                <span className="image-placeholder">{member.imagePlaceholder}</span>
+              </div>
+              <div className="member-details">
+                <h4>{member.name}</h4>
+                <h5>{member.role}</h5>
+                <p>{member.bio}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
   const [newApiKey, setNewApiKey] = useState<string>('');
 
@@ -261,7 +317,10 @@ const Header: React.FC<{ setPage: React.Dispatch<React.SetStateAction<string>> }
   <header className="app-header">
     <h1>Career Quizine</h1>
     <p>Your Ultimate Recipe for Career Success</p>
-    <button onClick={() => setPage('home')} className="home-button">Home</button>
+    <div className="header-nav">
+      <button onClick={() => setPage('home')} className="home-button">Home</button>
+      <button onClick={() => setPage('about')} className="about-button">About</button>
+    </div>
   </header>
 );
 
@@ -412,6 +471,7 @@ const App: React.FC = () => {
           onSubmit={(answers) => handleQuizSubmit(answers, 'detailed')}
         />
       )}
+      {page === 'about' && <AboutPage />}
     </div>
   );
 };
