@@ -99,57 +99,51 @@ const detailedQuestions: Question[] = [
 const AboutPage: React.FC = () => {
   const teamMembers = [
     {
-      name: 'Person 1',
+      name: 'Joe',
       role: 'Founder & Career Strategist',
-      bio: 'With a passion for helping individuals discover their true potential, Person 1 brings years of career counseling experience to Career Quizine. Their innovative approach combines psychological insights with practical career guidance.',
-      imagePlaceholder: '👩‍💼' // Replace with actual image or path later
+      bio: 'Joe brings years of career counseling experience to Career Quizine.',
+      imagePath: `${process.env.PUBLIC_URL}/joe.jpg`, 
     },
     {
-      name: 'Person 2', 
+      name: 'Angel',
       role: 'UX Design & Research Lead',
-      bio: 'Person 2 is dedicated to creating intuitive, engaging user experiences. Their background in design psychology ensures that Career Quizine provides not just insights, but an enjoyable journey of self-discovery.',
-      imagePlaceholder: '👨‍💻'
+      bio: 'Angel creates intuitive, engaging user experiences.',
+      imagePath: `${process.env.PUBLIC_URL}/angel.jpg`,
     },
     {
-      name: 'Person 3',
+      name: 'Axel',
       role: 'Technology & AI Specialist',
-      bio: 'A tech innovator with a deep understanding of AI and machine learning, Person 3 powers the intelligent recommendation engine behind Career Quizine, turning complex data into actionable career insights.',
-      imagePlaceholder: '🧑‍💻'
-    }
+      bio: 'Axel powers the intelligent recommendation engine with AI.',
+      imagePath: `${process.env.PUBLIC_URL}/axel.png`,
+    },
   ];
 
   return (
     <div className="about-page">
-      <div className="about-intro">
-        <h2>About Career Quizine</h2>
-        <p>
-          Career Quizine is more than just a career assessment tool—it's a recipe for professional success. 
-          We believe that finding the right career path should be an enjoyable, insightful journey. 
-          By blending cutting-edge AI technology with deep psychological insights, 
-          we help individuals uncover their unique professional potential.
-        </p>
-      </div>
-      
-      <div className="team-section">
-        <h3>Meet Our Team</h3>
-        <div className="team-members">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="team-member">
-              <div className="member-image">
-                <span className="image-placeholder">{member.imagePlaceholder}</span>
-              </div>
-              <div className="member-details">
-                <h4>{member.name}</h4>
-                <h5>{member.role}</h5>
-                <p>{member.bio}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <h2>Meet Our Team</h2>
+      <div className="team-members">
+        {teamMembers.map((member, index) => (
+          <div key={index} className="team-member">
+            <img
+              src={member.imagePath}
+              alt={`${member.name}'s photo`}
+              style={{
+                width: '150px',
+                height: '150px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+              }}
+            />
+            <h4>{member.name}</h4>
+            <p>{member.role}</p>
+            <p>{member.bio}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
+
 
 
 const APIKeyForm: React.FC<APIKeyFormProps> = ({ onSubmit, apiKey }) => {
@@ -425,14 +419,20 @@ const App: React.FC = () => {
         <p>Before we help you find your perfect career path, let's have some fun!</p>
         <p>Catch as many food items as you can to unlock your career assessment.</p>
         <p>Use the left and right arrow keys to move the basket.</p>
-        <Button variant="primary" size="lg" onClick={startGame}>
-          Start Game
-        </Button>
+        <div className="welcome-buttons">
+          <Button variant="primary" size="lg" onClick={startGame}>
+            Start Game
+          </Button>
+          <Button variant="secondary" size="lg" onClick={() => setPage('home')} className="ml-3">
+            Skip to Home
+          </Button>
+        </div>
       </div>
     ) : (
       <FoodCatchGame onGameComplete={handleGameComplete} />
     );
   }
+  
 
   return (
     <div className="App">
